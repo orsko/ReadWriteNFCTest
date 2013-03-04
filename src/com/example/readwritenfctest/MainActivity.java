@@ -15,18 +15,19 @@ import android.nfc.tech.NdefFormatable;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.Menu;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.RadioGroup;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 public class MainActivity extends Activity {
 
 	TextView tv;
-	Button enableWrite;
+	Switch enableWrite;
 	Button enableRead;
 	EditText StringToWrite;
 	IntentFilter[] mWriteTagFilters;
@@ -38,13 +39,17 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		tv = (TextView) findViewById(R.id.textView3);
-		enableWrite = (Button) findViewById(R.id.toggleButton1);
-		enableRead = (Button) findViewById(R.id.toggleButton2);
+		enableWrite = (Switch) findViewById(R.id.switch1);
 		StringToWrite = (EditText) findViewById(R.id.editText1);
-		enableWrite.setOnClickListener(new OnClickListener() {
+		enableWrite.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			@Override
-			public void onClick(View v) {
-				enableWrite();
+			public void onCheckedChanged(CompoundButton arg0, boolean arg1) {
+				if (arg1) {
+					enableWrite();
+				} else {
+					disableWrite();
+				}
+
 			}
 		});
 		mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
@@ -58,7 +63,10 @@ public class MainActivity extends Activity {
 		mWriteTagFilters = new IntentFilter[] { tagDetected };
 		mNfcAdapter.enableForegroundDispatch(this, mNfcPendingIntent,
 				mWriteTagFilters, null);
+	}
 
+	protected void disableWrite() {
+		mNfcAdapter.disableForegroundDispatch(this);
 	}
 
 	@Override
